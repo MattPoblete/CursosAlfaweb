@@ -1,18 +1,26 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <b-container fluid class="p-3 my-3">
+    <b-card-group deck class="d-flex justify-content-center"  >
+      <Card v-for="(curso, i) in GETCURSOS" :key="i" :curso="curso" />
+    </b-card-group>
+
+  </b-container>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { mapGetters } from 'vuex'
+import Card from '../components/Card.vue'
 
 export default {
   name: 'Home',
+  computed:{
+    ...mapGetters(['GETCURSOS'])
+  },
+  methods:{
+
+  },
   components: {
-    HelloWorld
+    Card
   }
 }
 </script>
