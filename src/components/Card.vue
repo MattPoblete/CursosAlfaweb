@@ -6,7 +6,7 @@
             img-alt="Imagen"
             img-top
             tag="article"
-            style="max-width: 16rem; height: 70vh"
+            style="max-width: 16rem; height: 650px"
             class="m-2"
             sub-title="Información:"
         >

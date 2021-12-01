@@ -28,14 +28,11 @@
 
                 <label for="example-datepicker">Fecha de registro</label>
                 <b-form-datepicker v-model="form.fecha" id="fecha" class="mb-3" />
+     
+                <b-form-checkbox @click="btnCheck" v-model="form.estado" name="check-button" switch>
+                    Terminado: <b>{{form.estado ? 'Si':'No'}}</b>
+                </b-form-checkbox>
 
-                <b-row class="mx-0">
-                    
-                    <p class="mr-3">Terminado:</p>
-                    <b-form-checkbox v-model="form.estado" name="check-button" switch>
-                        
-                    </b-form-checkbox>
-                </b-row>
             </b-form-group>
 
             <div class="d-flex justify-content-around my-4">
@@ -70,7 +67,7 @@ export default {
             }
         }
     },
-    async created(){
+    created(){
         if(this.curso == undefined){
             this.$router.push({name:'administracion'})
         }
@@ -80,22 +77,42 @@ export default {
         
         this.form = {...this.curso.data}
     },
+
     methods:{
         ...mapActions(['editCurso', 'getCurso']),
         editar(){
-            this.confirm('Editar', '¿Está seguro de que desea editar los datos ingresados?')
-            .then( (value)=>{
-                    if(value == true){
-                        const newData = this.form
-                        this.editCurso({id:this.curso.id, data: newData})
-                        this.toast('Curso editado', `Los datos de ${this.curso.data.nombre} han sido actualizados con éxito`, 'success', 2000)
-                        setTimeout(()=>this.$router.push({name: 'administracion'}),2100)                        
-                    }
-                    else{
-                        this.toast('Operación cancelada', `Los datos de ${this.curso.data.nombre} no han sido modificados. (Operación cancelada por el usuario)`, 'warning', 2500)
-                    }
+            if(!this.form.nombre || !this.form.imagen || !this.form.cupos || !this.form.inscritos || !this.form.duracion || !this.form.costo || !this.form.codigo || !this.form.descripcion || !this.form.fecha){
+                this.toast('Confirmar campos', 'Por favor, confirme que todos los campos estén completos', 'warning', 2500)
+            }
+            else{
+                if(this.form.inscritos>this.form.cupos){
+                    this.toast('¡Error!', '¡Error!, la cantidad de alumnos inscritos no puede ser mayor a los cupos disponibles', 'danger', 2500)
                 }
-            )
+                else{
+                    this.confirm('Editar', '¿Está seguro de que desea editar los datos ingresados?')
+                    .then( (value)=>{
+                            if(value == true){
+                                const newData = this.form
+                                if(newData.estado == true){
+                                    newData.inscritos = 0
+                                    this.editCurso({id:this.curso.id, data: newData})
+                                    this.toast('Curso editado', `Los datos de ${this.curso.data.nombre} han sido actualizados con éxito`, 'success', 2000)
+                                    setTimeout(()=>this.$router.push({name: 'administracion'}),2100)
+                                }
+                                else{
+                                    this.editCurso({id:this.curso.id, data: newData})
+                                    this.toast('Curso editado', `Los datos de ${this.curso.data.nombre} han sido actualizados con éxito`, 'success', 2000)
+                                    setTimeout(()=>this.$router.push({name: 'administracion'}),2100)                        
+                                }
+                            }
+                            else{
+                                this.toast('Operación cancelada', `Los datos de ${this.curso.data.nombre} no han sido modificados. (Operación cancelada por el usuario)`, 'warning', 2500)
+                            }
+                        }
+                    )
+                }
+            }
+            
         },
         limpiar(){
             this.confirm('Limpiar datos', 'Los datos del formulario serán eliminados y la información del curso quedará en blanco, estos cambios no permanecerán a no ser que guardes. ¿Desea vaciar el formulario?')
@@ -109,6 +126,9 @@ export default {
                 this.form.descripcion=''
                 this.form.fecha=''
                 this.form.estado= false
+        },
+        btnCheck(){
+            console.log('a')
         }
     }
 }

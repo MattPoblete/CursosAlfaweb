@@ -9,14 +9,14 @@ export default{
             autoHideDelay: autoHideDelay,
             })
         },
-        confirm(title, message) {
+        confirm(title, message, okTitle = "Si", cancelTitle = "No", okVariant = "success") {
             return this.$bvModal.msgBoxConfirm(message, {
               title: title,
-              size: 'sm',
-              buttonSize: 'sm',
-              okVariant: 'primary',
-              okTitle: 'Si',
-              cancelTitle: 'No',
+              size: 'md',
+              buttonSize: 'md',
+              okVariant: okVariant,
+              okTitle: okTitle,
+              cancelTitle: cancelTitle,
               footerClass: 'p-2',
               hideHeaderClose: false,
               centered: true

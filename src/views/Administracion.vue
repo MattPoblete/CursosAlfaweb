@@ -67,7 +67,7 @@
                                 <b-icon variant="light" icon="pencil-fill"/>
                             </b-button>
 
-                            <b-button variant="danger" size="sm" @click="eliminar(curso.id)">
+                            <b-button variant="danger" size="sm" @click="eliminar(curso.id, curso.data.nombre)">
                                 <b-icon icon="trash-fill"/>
                             </b-button>
                         </b-row>
@@ -102,21 +102,21 @@ export default {
         totalAlumnos(){
             let total = 0
             for (let i = 0; i < this.GETCURSOS.length; i++) {
-                const element = this.GETCURSOS[i].data.cupos;
+                const element = parseInt(this.GETCURSOS[i].data.cupos);
                 total = element + total
             }
             return total
         },
         totalInscritos(){
-            let total = 0
+            let totalInscritos = 0
             for (let i = 0; i < this.GETCURSOS.length; i++) {
-                const element = this.GETCURSOS[i].data.inscritos;
-                total = element + total
+                const element = parseInt(this.GETCURSOS[i].data.inscritos);
+               totalInscritos = element + totalInscritos
             }
-            return total
+            return totalInscritos
         },
         cuposRestantes(){
-            let restantes = this.totalAlumnos - this.totalInscritos
+            let restantes = parseInt(this.totalAlumnos - this.totalInscritos)
             return restantes
         },
         cursosTerminados(){
@@ -184,7 +184,7 @@ export default {
                     this.toast('¡Error!','La cantidad de alumnos inscritos no puede superar los cupos existentes', 'danger', 2500)
                 }
                 else{
-                    this.confirm('Confirmar',`¿Está seguro que desea agregar el curso ${this.modal.nombre}?`)
+                    this.confirm('Confirmar',`¿Está seguro que desea agregar el curso ${this.modal.nombre}?`, 'Agregar curso', 'Cancelar')
                     .then(value=>{
                         switch (value){
                             case true:
@@ -201,19 +201,13 @@ export default {
                                     fecha: this.fecha
                                 })
                                 this.toast('¡Curso agregado correctamente!',`El curso ${this.modal.nombre} ha sido añadido correctamente`, 'success', 2500)
-                                this.modal.nombre=''
-                                this.modal.imagen=''
-                                this.modal.cupos=''
-                                this.modal.inscritos=''
-                                this.modal.duracion=''
-                                this.modal.costo=''
-                                this.modal.codigo=''
-                                this.modal.descripcion=''
+                                this.limpiar()
                                 this.$bvModal.hide('agregar')
                                 break
                             
                             case false:
                                 this.toast('Operación cancelada', `Operación cancelada por el usuario. El curso "${this.modal.nombre}" no ha sido agregado`, 'warning', 2500)
+                                this.$bvModal.hide('agregar')
                                 break
                         }
                     })
@@ -221,8 +215,20 @@ export default {
                 }
             }
         },
-        eliminar(curso){
-            this.delCurso(curso)
+        eliminar(curso, nombre){
+
+            this.confirm('Eliminar curso', `¿Desea eliminar el curso ${nombre}?`, 'Si, Eliminar', 'Cancelar', 'danger')
+            .then(value=>{
+                switch(value){
+                    case true:
+                        this.toast('Curso eliminado', `El curso ${nombre} ha sido eliminado exitosamente`, 'warning', 2500)
+                        this.delCurso(curso)
+                        break
+                    case false:
+                        this.toast('Operación cancelada', `El curso ${nombre} no ha sido eliminado. (Operacion cancelada por el usuario)`, 'info', 2500)
+                    }
+                }
+            )
         },
         editar(payload){
             this.$router.push({name:'editar', params: {curso: payload, id:payload.id} })
